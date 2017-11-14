@@ -19,65 +19,77 @@ import scala.util.{Failure, Success, Try}
   */
 class MleapService()
                   (implicit ec: ExecutionContext) {
-  private var bundle: Option[Bundle[Transformer]] = None
-
-  def setBundle(bundle: Bundle[Transformer]): Unit = synchronized(this.bundle = Some(bundle))
-  def unsetBundle(): Unit = synchronized(this.bundle = None)
-
-  def loadModel(request: LoadModelRequest): Future[LoadModelResponse] = Future {
-    (for(bf <- managed(BundleFile(new File(request.path.get.toString)))) yield {
-      bf.loadMleapBundle()
-    }).tried.flatMap(identity)
-  }.flatMap(r => Future.fromTry(r)).andThen {
-    case Success(b) => setBundle(b)
-  }.map(_ => LoadModelResponse())
-
-  def unloadModel(request: UnloadModelRequest): Future[UnloadModelResponse] = {
-    unsetBundle()
-    Future.successful(UnloadModelResponse())
-  }
-
-  def transform(frame: DefaultLeapFrame): Try[DefaultLeapFrame] = synchronized {
-    bundle.map {
-      _.root.transform(frame)
-    }.getOrElse(Failure(new IllegalStateException("no transformer loaded")))
-  }
-
-  def getSchema: Try[StructType] = synchronized {
-    bundle.map {
-      bundle => Success(bundle.root.schema)
-    }.getOrElse(Failure(new IllegalStateException("no transformer loaded")))
-  }
-
-
   private var bundle_6323: Option[Bundle[Transformer]] = None
+  private var bundle_4894: Option[Bundle[Transformer]] = None
+  private var bundle_6317: Option[Bundle[Transformer]] = None
+  private var bundle_6757: Option[Bundle[Transformer]] = None
 
-  def setBundle_6323(bundle: Bundle[Transformer]): Unit = synchronized(this.bundle_6323 = Some(bundle))
-  def unsetBundle_6323(): Unit = synchronized(this.bundle_6323 = None)
+  def setBundle(bundle: Bundle[Transformer], company_id: Int): Unit = synchronized {
+      company_id match {
+          case 6323 => this.bundle_6323 = Some(bundle)
+          case 4894 => this.bundle_4894 = Some(bundle)
+          case 6317 => this.bundle_6317 = Some(bundle)
+          case 6757 => this.bundle_6757 = Some(bundle)
+          case _ => Failure(new IllegalArgumentException("invalid company_id"))
+      }
+  }
+  def unsetBundle(company_id: Int): Unit = synchronized {
+      company_id match {
+          case 6323 => this.bundle_6323 = None
+          case 4894 => this.bundle_4894 = None
+          case 6317 => this.bundle_6317 = None
+          case 6757 => this.bundle_6757 = None
+          case _ => Failure(new IllegalArgumentException("invalid company_id"))
+      }
+  }
 
-  def loadModel_6323(request: LoadModelRequest): Future[LoadModelResponse] = Future {
+  def loadModel(request: LoadModelRequest, company_id: Int): Future[LoadModelResponse] = Future {
     (for(bf <- managed(BundleFile(new File(request.path.get.toString)))) yield {
       bf.loadMleapBundle()
     }).tried.flatMap(identity)
   }.flatMap(r => Future.fromTry(r)).andThen {
-    case Success(b) => setBundle_6323(b)
+    case Success(b) => setBundle(b, company_id)
   }.map(_ => LoadModelResponse())
 
-  def unloadModel_6323(request: UnloadModelRequest): Future[UnloadModelResponse] = {
-    unsetBundle_6323()
+  def unloadModel(request: UnloadModelRequest, company_id: Int): Future[UnloadModelResponse] = {
+    unsetBundle(company_id)
     Future.successful(UnloadModelResponse())
   }
 
-  def transform_6323(frame: DefaultLeapFrame): Try[DefaultLeapFrame] = synchronized {
-    bundle_6323.map {
-      _.root.transform(frame)
-    }.getOrElse(Failure(new IllegalStateException("no transformer loaded")))
+  def transform(frame: DefaultLeapFrame, company_id: Int): Try[DefaultLeapFrame] = synchronized {
+      company_id match {
+          case 6323 => bundle_6323.map {
+                           _.root.transform(frame)
+                       }.getOrElse(Failure(new IllegalStateException("no transformer loaded")))
+          case 4894 => bundle_4894.map {
+                           _.root.transform(frame)
+                       }.getOrElse(Failure(new IllegalStateException("no transformer loaded")))
+          case 6317 => bundle_6317.map {
+                           _.root.transform(frame)
+                       }.getOrElse(Failure(new IllegalStateException("no transformer loaded")))
+          case 6757 => bundle_6757.map {
+                           _.root.transform(frame)
+                       }.getOrElse(Failure(new IllegalStateException("no transformer loaded")))
+          case _ => Failure(new IllegalArgumentException("invalid company_id"))
+      }
   }
 
-  def getSchema_6323: Try[StructType] = synchronized {
-    bundle_6323.map {
-      bundle => Success(bundle.root.schema)
-    }.getOrElse(Failure(new IllegalStateException("no transformer loaded")))
+  def getSchema(company_id: Int): Try[StructType] = synchronized {
+      company_id match {
+          case 6323 => bundle_6323.map {
+                           bundle => Success(bundle.root.schema)
+                       }.getOrElse(Failure(new IllegalStateException("no transformer loaded")))
+          case 4894 => bundle_4894.map {
+                           bundle => Success(bundle.root.schema)
+                       }.getOrElse(Failure(new IllegalStateException("no transformer loaded")))
+          case 6317 => bundle_6317.map {
+                           bundle => Success(bundle.root.schema)
+                       }.getOrElse(Failure(new IllegalStateException("no transformer loaded")))
+          case 6757 => bundle_6757.map {
+                           bundle => Success(bundle.root.schema)
+                       }.getOrElse(Failure(new IllegalStateException("no transformer loaded")))
+          case _ => Failure(new IllegalArgumentException("invalid company_id"))
+      }
   }
 
 }

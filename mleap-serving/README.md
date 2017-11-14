@@ -88,3 +88,61 @@ but keep the server running, just DELETE the `model` resource:
 ```
 curl -XDELETE http://localhost:65327/model
 ```
+
+
+### Loading and transforming with multiple models:
+
+1. Clone repo
+    ```
+    git clone git@github.com:movableink/mleap.git
+    ```
+
+1. Check out correct branch:
+    ```
+    cd mleap
+    git checkout serve-multiple-models
+    ```
+
+1. Build from source (http://mleap-docs.combust.ml/getting-started/building.html):
+    ```
+    git submodule init
+    git submodule update
+    sbt compile
+    sbt test
+    ``` 
+
+1. Copy external jar to mleap-serving/lib directory
+    ```
+    mkdir mleap-serving/lib
+    cp ~/dev/mleap-transformers/target/scala-2.11/mleap-transformers-assembly-1.0.jar mleap-serving/lib
+    ```
+
+1. Create docker image locally
+    ```
+    sbt mleap-serving/docker:publishLocal
+    ```
+
+1. Copy MLeap model bundles to /tmp/models
+    ```
+    mkdir /tmp/models
+    cp ~/dev/data-science/mleap_runtime_test/files/\*.zip /tmp/models
+    ```
+
+1. Create docker container
+    ```
+    docker run -d --rm -p 65327:65327 -v /tmp/models:/models combustml/mleap-serving:0.8.2-SNAPSHOT
+    ```
+
+1. Load models into endpoints
+    ```
+    curl -XPUT -H "content-type: application/json" -d '{"path":"/models/model_4894_mleap.zip"}' http://localhost:65327/model_4894
+    curl -XPUT -H "content-type: application/json" -d '{"path":"/models/model_6317_mleap.zip"}' http://localhost:65327/model_6317
+    curl -XPUT -H "content-type: application/json" -d '{"path":"/models/model_6757_mleap.zip"}' http://localhost:65327/model_6757
+    curl -XPUT -H "content-type: application/json" -d '{"path":"/models/model_6323_mleap.zip"}' http://localhost:65327/model_6323
+    ```
+
+1. Transform an input
+    ```
+    curl -XPOST -H "accept: application/json" -H "content-type: application/json" -d @/Users/melaniefreed/dev/data-science/mleap_runtime_test/files/test_input_4894_0.05_9ed07318c7fab562eb65009828fa2a752d30ee4.json http://localhost:65327/transform_4894
+    ```
+

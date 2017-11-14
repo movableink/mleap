@@ -35,38 +35,72 @@ class MleapResource(service: MleapService)
   val routes = handleExceptions(errorHandler(logger)) {
     withLog(logger) {
       logRequestResult(LoggingMagnet(recordLog(_, Logging.InfoLevel))) {
-        path("model") {
+        path("model_4894") {
           put {
             entity(as[LoadModelRequest]) {
               request =>
-                complete(service.loadModel(request))
+                complete(service.loadModel(request, 4894))
             }
           } ~ delete {
-            complete(service.unloadModel(UnloadModelRequest()))
+            complete(service.unloadModel(UnloadModelRequest(), 4894))
           } ~ get {
-            complete(service.getSchema)
+            complete(service.getSchema(4894))
           }
-        } ~ path("transform") {
+        } ~ path("transform_4894") {
           post {
             entity(as[DefaultLeapFrame]) {
-              frame => complete(service.transform(frame))
+              frame => complete(service.transform(frame, 4894))
             }
           }
         } ~ path("model_6323") {
           put {
             entity(as[LoadModelRequest]) {
               request =>
-                complete(service.loadModel_6323(request))
+                complete(service.loadModel(request, 6323))
             }
           } ~ delete {
-            complete(service.unloadModel_6323(UnloadModelRequest()))
+            complete(service.unloadModel(UnloadModelRequest(), 6323))
           } ~ get {
-            complete(service.getSchema_6323)
+            complete(service.getSchema(6323))
           }
         } ~ path("transform_6323") {
           post {
             entity(as[DefaultLeapFrame]) {
-              frame => complete(service.transform_6323(frame))
+              frame => complete(service.transform(frame, 6323))
+            }
+          }
+        } ~ path("model_6317") {
+          put {
+            entity(as[LoadModelRequest]) {
+              request =>
+                complete(service.loadModel(request, 6317))
+            }
+          } ~ delete {
+            complete(service.unloadModel(UnloadModelRequest(), 6317))
+          } ~ get {
+            complete(service.getSchema(6317))
+          }
+        } ~ path("transform_6317") {
+          post {
+            entity(as[DefaultLeapFrame]) {
+              frame => complete(service.transform(frame, 6317))
+            }
+          }
+        } ~ path("model_6757") {
+          put {
+            entity(as[LoadModelRequest]) {
+              request =>
+                complete(service.loadModel(request, 6757))
+            }
+          } ~ delete {
+            complete(service.unloadModel(UnloadModelRequest(), 6757))
+          } ~ get {
+            complete(service.getSchema(6757))
+          }
+        } ~ path("transform_6757") {
+          post {
+            entity(as[DefaultLeapFrame]) {
+              frame => complete(service.transform(frame, 6757))
             }
           }
         }

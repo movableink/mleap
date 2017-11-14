@@ -30,9 +30,9 @@ class MleapServer(tConfig: Config)
   val resource = new MleapResource(service)
   val routes = resource.routes
 
-  for(model <- config.model) {
-    service.loadModel(LoadModelRequest().withPath(model))
-  }
+  //for(model <- config.model) {
+  //  service.loadModel(LoadModelRequest().withPath(model))
+  //}
 
   Http().bindAndHandle(routes, config.http.bindHostname, config.http.bindPort)
 }
