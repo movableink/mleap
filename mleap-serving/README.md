@@ -92,6 +92,8 @@ curl -XDELETE http://localhost:65327/model
 
 ### Loading and transforming with multiple models:
 
+Note: MLeap uses the sbt native packager to create the docker container: http://www.scala-sbt.org/sbt-native-packager/formats/docker.html
+
 1. Clone repo
     ```
     git clone git@github.com:movableink/mleap.git
