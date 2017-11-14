@@ -52,6 +52,23 @@ class MleapResource(service: MleapService)
               frame => complete(service.transform(frame))
             }
           }
+        } ~ path("model_6323") {
+          put {
+            entity(as[LoadModelRequest]) {
+              request =>
+                complete(service.loadModel_6323(request))
+            }
+          } ~ delete {
+            complete(service.unloadModel_6323(UnloadModelRequest()))
+          } ~ get {
+            complete(service.getSchema_6323)
+          }
+        } ~ path("transform_6323") {
+          post {
+            entity(as[DefaultLeapFrame]) {
+              frame => complete(service.transform_6323(frame))
+            }
+          }
         }
       }
     }

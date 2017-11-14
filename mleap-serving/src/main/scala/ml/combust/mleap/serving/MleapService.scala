@@ -48,4 +48,36 @@ class MleapService()
       bundle => Success(bundle.root.schema)
     }.getOrElse(Failure(new IllegalStateException("no transformer loaded")))
   }
+
+
+  private var bundle_6323: Option[Bundle[Transformer]] = None
+
+  def setBundle_6323(bundle: Bundle[Transformer]): Unit = synchronized(this.bundle_6323 = Some(bundle))
+  def unsetBundle_6323(): Unit = synchronized(this.bundle_6323 = None)
+
+  def loadModel_6323(request: LoadModelRequest): Future[LoadModelResponse] = Future {
+    (for(bf <- managed(BundleFile(new File(request.path.get.toString)))) yield {
+      bf.loadMleapBundle()
+    }).tried.flatMap(identity)
+  }.flatMap(r => Future.fromTry(r)).andThen {
+    case Success(b) => setBundle_6323(b)
+  }.map(_ => LoadModelResponse())
+
+  def unloadModel_6323(request: UnloadModelRequest): Future[UnloadModelResponse] = {
+    unsetBundle_6323()
+    Future.successful(UnloadModelResponse())
+  }
+
+  def transform_6323(frame: DefaultLeapFrame): Try[DefaultLeapFrame] = synchronized {
+    bundle_6323.map {
+      _.root.transform(frame)
+    }.getOrElse(Failure(new IllegalStateException("no transformer loaded")))
+  }
+
+  def getSchema_6323: Try[StructType] = synchronized {
+    bundle_6323.map {
+      bundle => Success(bundle.root.schema)
+    }.getOrElse(Failure(new IllegalStateException("no transformer loaded")))
+  }
+
 }
