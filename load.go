@@ -14,7 +14,21 @@ import (
 	"github.com/gocql/gocql"
 	_ "github.com/lib/pq"
 	common "github.com/movableink/go-go-common-go"
+	"github.com/movableink/go-go-common-go/stats"
 )
+
+var validEvents = map[string]int{
+	"pageview":          1,
+	"cart_add":          1,
+	"conversion":        1,
+	"open|glance|visit": 1,
+	"open|glance":       1,
+	"open|visit":        1,
+	"skim":              1,
+	"read":              1,
+	"click":             1,
+	"click|u_click":     1,
+}
 
 type PG struct {
 	*sql.DB
@@ -103,7 +117,10 @@ func (cassandra *Cassandra) GetUserEvents(key string, limit int) ([]*common.User
 			return nil, err
 		}
 
-		events = append(events, event)
+		_, ok := validEvents[event.EventType]
+		if ok {
+			events = append(events, event)
+		}
 	}
 
 	return events, iterator.Close()
@@ -205,6 +222,8 @@ func main() {
 		os.Exit(1)
 	}
 
+	stats.SetupStatsd("beagle.iad.mattbook.misrv.net", "trivial.misrv.net", 8125)
+
 	cassandra, err := NewCassandra([]string{
 		"10.1.1.42",
 		"10.1.1.152",
@@ -226,7 +245,7 @@ func main() {
 		os.Exit(1)
 	}
 
-	inputs, err := getInputs(companyID, 100, pg, cassandra)
+	inputs, err := getInputs(companyID, 1000, pg, cassandra)
 	if err != nil {
 		pg.Close()
 		cassandra.Close()
@@ -237,7 +256,7 @@ func main() {
 
 	// Warm up the service
 	for _, input := range inputs {
-		_, err := testTransform(companyID, input)
+		time, err := testTransform(companyID, input)
 		if err != nil {
 			pg.Close()
 			cassandra.Close()
@@ -245,8 +264,10 @@ func main() {
 			fmt.Println(os.Stderr, err)
 			os.Exit(1)
 		}
+		fmt.Printf("user: %v_%v, events: %v, mleap time: %v\n", input.Rows[0][0], companyID, len(input.Rows[0][1].([]string)), time)
 	}
 
+	stats.Close()
 	pg.Close()
 	cassandra.Close()
 }
@@ -306,5 +327,9 @@ func testTransform(companyID string, input *Input) (time.Duration, error) {
 		return 0, err
 	}
 
-	return time.Since(start), nil
+	end := time.Since(start)
+	duration := end.Nanoseconds()
+
+	stats.ReportGauge("mleap.gauge", duration, 1.0)
+	return end, nil
 }
